@@ -14,6 +14,14 @@ app.use((req, res, next) => {
 
 app.get("/location", (req, res) => {
   // 環境変数から緯度経度を取って、JSON形式で返す
+  if ( process.env.longitude === undefined || process.env.latitude === undefined) {
+    res.status(404).send("Not Found");
+  }
+
+  res.status(200).json({
+    longitude: process.env.longitude,
+    latitude: process.env.latitude
+  });
 });
 
 app.post("/location", (req, res) => {
@@ -21,6 +29,18 @@ app.post("/location", (req, res) => {
   // GET /location?lng=xxx&lat=xxx
   const longitude = req.query.lng;
   const latitude  = req.query.lat;
+
+  if (longitude === undefined || latitude === undefined) {
+    res.status(400).send("Bad Request");
+  } else {
+    process.env.longitude = longitude;
+    process.env.latitude  = latitude;
+
+    res.status(200).json({
+      longitude: process.env.longitude,
+      latitude: process.env.latitude
+    });
+  }
 });
 
 app.use("/", (req, res) => {
@@ -29,4 +49,4 @@ app.use("/", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Listen now\nport:${PORT}`);
-})
+});
